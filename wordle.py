@@ -40,7 +40,34 @@ def get_feedback(word):
     return feedback
 
 def apply_filter(word_list, current_word, feedback):
-    pass
+    
+    kept_words = []
+    
+    for word in word_list:
+        keep = True
+        
+        for i in range(len(word)):
+            if feedback[i] == 'x':
+                if current_word[i] in word:
+                    keep = False
+                    break
+                    
+            if feedback[i] == 'g':
+                if current_word[i] != word[i]:
+                    keep = False
+                    break
+                
+            if feedback[i] == 'y':
+                if current_word[i] != word[i] and current_word[i] not in word:
+                    keep = False
+                    break
+                
+        if keep:
+            kept_words.append(word)
+    
+    return kept_words
+    
+    
     
     
     
