@@ -39,48 +39,57 @@ def get_feedback(word):
     return feedback
 
 def apply_filter(word_list, current_word, feedback):
-    kept_words = []
-    
-    for word in word_list:
-        keep = True
-        
-        for i in range(len(word)):
-            if feedback[i] == 'x':
-                if current_word[i] in word:
-                    keep = False
-                    break
-                    
-            if feedback[i] == 'g':
-                if current_word[i] != word[i]:
-                    keep = False
-                    break
-                
-            if feedback[i] == 'y':
-                if current_word[i] != word[i] and current_word[i] not in word:
-                    keep = False
-                    break
-                
-        if keep:
-            kept_words.append(word)
-    
-    return kept_words
+    pass
     
 
-def play(ai):
-    pass
+def play(ai=False, output=False):
+    answered_correct = False
+    initial_guess = True
+        
+    while not answered_correct:      
+        if not ai:
+            guess = input('What is your guess: ')
+        else:
+            guess = 'crane'
+            
+        if not ai:
+            feedback = input('What is the colors of the answer: ')
+        else: 
+            feedback = get_feedback(guess)  
+        
+        if initial_guess:
+            filtered_list = apply_filter(answers_list, guess, feedback)
+            initial_guess = False
+        else: 
+            filtered_list = apply_filter(filtered_list, guess, feedback)
+            
+        if guess == wordle_word or feedback == 'ggggg':
+            answered_correct = True
+            print(f'You got the wordle! The word is {guess}')
+            break
+        
+        if output:
+            print(feedback)
+            print(filtered_list)
+            print(len(filtered_list))
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+        
+    
 
 guessable_words_list, answers_list = get_words_lists(path=PATH)
 wordle_word = random.choice(answers_list)
 
-guessed_word = 'crane'
 
-feedback = get_feedback(guessed_word)
-
-print(f'Current Wordle Word: {wordle_word}')
-print(f'Guessed Word {guessed_word}')
-
-print(feedback)
-
-xd = apply_filter(answers_list, guessed_word, feedback)
-
-print(xd)
+play(ai=False, output=True)
