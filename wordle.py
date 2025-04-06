@@ -30,7 +30,6 @@ def get_feedback(word):
     feedback = ''
     
     for i in range(len(word)):
-        
         if word[i] == wordle_word[i]:
             feedback += 'g'
         elif word[i] != wordle_word[i] and word[i] in wordle_word:
@@ -40,7 +39,6 @@ def get_feedback(word):
     return feedback
 
 def apply_filter(word_list, current_word, feedback):
-    
     kept_words = []
     
     for word in word_list:
@@ -67,10 +65,10 @@ def apply_filter(word_list, current_word, feedback):
     
     return kept_words
     
-    
-    
-    
-    
+
+def play(ai):
+    pass
+
 guessable_words_list, answers_list = get_words_lists(path=PATH)
 wordle_word = random.choice(answers_list)
 
