@@ -22,8 +22,28 @@ def get_words_lists(path):
     return guessable_words_list, answers_list
         
 
-def pick_word(word_list):
-    return word_list[0]
+def pick_word(word_list): # add letter frequency
+    frequency = {w: 0 for w in 'abcdefghijklmnopqrstuvwxyz'}
+    
+    for word in word_list:
+        for letter in set(word):
+            if letter in frequency:
+                frequency[letter] += 1
+                
+    best_word = None
+    best_score = -1
+    
+    for word in word_list:
+        unique_letters = set(word)
+        score = 0
+        for letter in unique_letters:
+            score += frequency[letter]
+            
+        if score > best_score:
+            best_score = score
+            best_word = word
+            
+    return best_word
    
 
 def get_feedback(word):
@@ -48,10 +68,10 @@ def play(ai=False, output=False):
         
     while not answered_correct:      
         if not ai:
-            guess = input('What is your guess: ')
+            guess = input('What is your guess: ').strip().lower()
         else:
             guess = 'crane'
-            
+                 
         if not ai:
             feedback = input('What is the colors of the answer: ')
         else: 
@@ -68,28 +88,18 @@ def play(ai=False, output=False):
             print(f'You got the wordle! The word is {guess}')
             break
         
+        print(f'You guessed {guess}')
+        print(f'The feedback is: {feedback}')
+        
         if output:
-            print(feedback)
             print(filtered_list)
             print(len(filtered_list))
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-    
-        
-    
-
 guessable_words_list, answers_list = get_words_lists(path=PATH)
 wordle_word = random.choice(answers_list)
 
 
-play(ai=False, output=True)
+x = pick_word(answers_list)
+
+print(x)
