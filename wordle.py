@@ -59,18 +59,49 @@ def get_feedback(word):
     return feedback
 
 def apply_filter(word_list, current_word, feedback):
-    pass
+    kept_words = []
+ 
+    for word in word_list:
+        keep = True
+        
+        for i in range(len(word)):
+            if feedback[i] == 'x':
+                if current_word[i] in word:
+                    keep = False
+                    break
+                    
+            if feedback[i] == 'g':
+                if current_word[i] != word[i]:
+                    keep = False
+                    break
+                
+            if feedback[i] == 'y':
+                if current_word[i] == word[i] or current_word[i] not in word:
+                    keep = False
+                    break
+                
+        if keep:
+            kept_words.append(word)
+            
+    return kept_words
     
 
 def play(ai=False, output=False):
     answered_correct = False
     initial_guess = True
+    filtered_list = answers_list
+    num_guess = 0
         
     while not answered_correct:      
         if not ai:
             guess = input('What is your guess: ').strip().lower()
         else:
-            guess = 'crane'
+            if initial_guess:
+                guess = 'crane'
+            else:
+                guess = pick_word(filtered_list)
+        
+        num_guess += 1
                  
         if not ai:
             feedback = input('What is the colors of the answer: ')
@@ -86,6 +117,7 @@ def play(ai=False, output=False):
         if guess == wordle_word or feedback == 'ggggg':
             answered_correct = True
             print(f'You got the wordle! The word is {guess}')
+            print('It took you ' + str(num_guess) + ' guesses')
             break
         
         print(f'You guessed {guess}')
@@ -97,9 +129,7 @@ def play(ai=False, output=False):
         
         
 guessable_words_list, answers_list = get_words_lists(path=PATH)
-wordle_word = random.choice(answers_list)
+wordle_word = 'moral'
 
 
-x = pick_word(answers_list)
-
-print(x)
+play(ai=True, output=True)
