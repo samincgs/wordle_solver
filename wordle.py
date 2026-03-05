@@ -119,7 +119,7 @@ def play_in_terminal(ai):
             guess = 'crane' if initial_guess else pick_word(filtered_list)
             
         num_guess += 1
-        print(num_guess)
+        
         if not ai:
             feedback = validate_input(input_type='feedback', question='What is your feedback? ')
         else:
@@ -146,9 +146,103 @@ def play_in_terminal(ai):
     
 
 def play_gui(ai):
+    global answered_correct, num_guess, initial_guess, filtered_list
+
+    def submit():
+        global answered_correct, num_guess, initial_guess, filtered_list
+        allowed = set(CORRECT_ANSWER + WRONG_ANSWER + SEMI_CORRECT_ANSWER)
+        left_textbox.configure(state='normal')
+        right_textbox.configure(state='normal')
+        
+        left_textbox.delete('0.0', 'end')
+        
+        if not ai:
+            guess = guess_str.get()
+        else:
+            guess_str.set('stare' if initial_guess else pick_word(filtered_list))
+            guess = guess_str.get()
+            
+        if not ai:
+            feedback = feedback_str.get()
+        else:
+            feedback_str.set(get_feedback(guess))
+            feedback = feedback_str.get()
+        
+        if (len(guess) != MAX_GUESS_LENGTH) or (not guess.isalpha()):
+            left_textbox.insert('0.0', 'Guess is invalid. Must be correct length, only letters, and allowed characters.')
+            return
+        
+        if (len(feedback) != MAX_GUESS_LENGTH) or (not feedback.isalpha()) or (not set(feedback).issubset(allowed)):
+            left_textbox.insert('0.0', 'Feedback is invalid. Must be correct length, only letters, and allowed characters.')
+            return
+        
+        num_guess += 1
+        
+        if initial_guess:
+            filtered_list = apply_filter(answers_list, guess, feedback)
+            initial_guess = False
+        else: 
+            filtered_list = apply_filter(filtered_list, guess, feedback)
+        
+        right_textbox.insert('end', f'{num_guess}. {guess}\n')
+        
+        if (guess == wordle_word) or (feedback == 'ggggg'):
+            answered_correct = True
+            left_textbox.insert('0.0', f'You got the wordle! The word is {guess}\nIt took you ' + str(num_guess) + ' guesses')
+            return
+        
+        
+        left_textbox.insert('0.0', f'Possible Options:\n\n{'\n'.join(filtered_list)}')
+        left_textbox.configure(state='disabled')
+        right_textbox.configure(state='disabled')
+        
+        if ai:
+            submit_button.invoke()
+
+
     app = ctk.CTk()
     app.title("Wordle Helper")
     app.geometry("500x500")
+
+    app.columnconfigure(0, weight=1)
+    
+    guess_str = ctk.StringVar()
+    feedback_str = ctk.StringVar()
+
+    guess_label = ctk.CTkLabel(app, text="What is your guess?")
+    guess_entry = ctk.CTkEntry(app, placeholder_text="Guess", textvariable=guess_str)
+
+    feedback_label = ctk.CTkLabel(app, text="Enter feedback:")
+    feedback_entry = ctk.CTkEntry(app, placeholder_text="Feedback", textvariable=feedback_str)
+
+    submit_button = ctk.CTkButton(app, text="Submit", command=submit)
+
+    split_frame = ctk.CTkFrame(app)
+    split_frame.columnconfigure(0, weight=7)
+    split_frame.columnconfigure(1, weight=3)
+    split_frame.rowconfigure(0, weight=1)
+    
+    left_textbox = ctk.CTkTextbox(split_frame, wrap="word", state='normal')
+    right_textbox = ctk.CTkTextbox(split_frame, wrap="word", width=20, state='normal')
+    right_textbox.insert('end', f'All Guesses:\n\n')
+    
+    
+    split_frame.grid(row=5, column=0, columnspan=2, padx=20, pady=20, sticky="nsew")
+    
+    guess_label.grid(row=0, column=0, columnspan=2, padx=20, pady=(30,0), sticky="w")
+    guess_entry.grid(row=1, column=0, columnspan=2, padx=20, pady=(0,20), sticky="ew")
+
+    feedback_label.grid(row=2, column=0, columnspan=2, padx=20, sticky="w")
+    feedback_entry.grid(row=3, column=0, columnspan=2, padx=20, pady=(0,20), sticky="ew")
+
+    submit_button.grid(row=4, column=0, columnspan=2, padx=20, pady=(10,20), sticky="ew")
+    
+    left_textbox.grid(row=0, column=0, sticky="nsew")
+
+    right_textbox.grid(row=0, column=1, sticky="nsew")
+    
+    if ai:
+        submit_button.invoke()
     
     app.mainloop()
 
@@ -160,13 +254,13 @@ def play(ai=False, ui=False):
         
         
 guessable_words_list, answers_list = get_words_lists(path=PATH)
-wordle_word = random.choice(answers_list)
+wordle_word = 'theft'
 answered_correct = False
 initial_guess = True
 filtered_list = answers_list.copy()
 num_guess = 0
 
 try:
-    play(ui=False)
+    play(ui=True, ai=True)
 except KeyboardInterrupt:
     sys.exit()
