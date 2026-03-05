@@ -261,6 +261,6 @@ filtered_list = answers_list.copy()
 num_guess = 0
 
 try:
-    play(ui=True, ai=True)
+    play(ui=True, ai=False)
 except KeyboardInterrupt:
     sys.exit()
